@@ -345,7 +345,7 @@ def patch_mistral_nemo_attention(function):
 pass
 
 
- Store original Mistral forward methods
+#Store original Mistral forward methods
 original_mistral_attention_forward = MistralAttention.forward
 original_mistral_sdpa_attention_forward = MistralSdpaAttention.forward
 original_mistral_flash_attention2_forward = MistralFlashAttention2.forward
