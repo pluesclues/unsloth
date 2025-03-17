@@ -1590,19 +1590,19 @@ pass
 
 
 
+original_attention_forward      = LlamaAttention.forward
+original_sdpa_attention_forward = LlamaSdpaAttention.forward
+original_flash_attention2_forward = LlamaFlashAttention2.forward
+original_decoder_layer_forward  = LlamaDecoderLayer.forward
+original_model_forward          = LlamaModel.forward
+original_for_causal_lm_forward  = LlamaForCausalLM.forward
+original_peft_model_for_causal_lm_forward = PeftModelForCausalLM.forward
+import transformers.models.llama.modeling_llama
+original_LLamaRotaryEmbedding =  transformers.models.llama.modeling_llama.LlamaRotaryEmbedding 
+#original_LLamaLinearScalingRotaryEmbedding = transformers.models.llama.modeling_llama.LlamaLinearScalingRotaryEmbedding
 
 class FastLlamaModel:
-    def __init__(self):
-        self.original_attention_forward      = LlamaAttention.forward
-        self.original_sdpa_attention_forward = LlamaSdpaAttention.forward
-        self.original_flash_attention2_forward = LlamaFlashAttention2.forward
-        self.original_decoder_layer_forward  = LlamaDecoderLayer.forward
-        self.original_model_forward          = LlamaModel.forward
-        self.original_for_causal_lm_forward  = LlamaForCausalLM.forward
-        self.original_peft_model_for_causal_lm_forward = PeftModelForCausalLM.forward
-        import transformers.models.llama.modeling_llama
-        self.original_LLamaRotaryEmbedding =  transformers.models.llama.modeling_llama.LlamaRotaryEmbedding 
-    def set_functions(self):
+    def set_functions():
         LlamaAttention      .forward = LlamaAttention_fast_forward
         LlamaSdpaAttention  .forward = LlamaAttention_fast_forward
         LlamaFlashAttention2.forward = LlamaAttention_fast_forward
@@ -1611,17 +1611,19 @@ class FastLlamaModel:
         LlamaForCausalLM    .forward = CausalLM_fast_forward(LlamaModel_fast_forward_inference)
         PeftModelForCausalLM.forward = PeftModelForCausalLM_fast_forward
         transformers.models.llama.modeling_llama.LlamaRotaryEmbedding = LlamaRotaryEmbedding
+        #transformers.models.llama.modeling_llama.LlamaLinearScalingRotaryEmbedding = LlamaLinearScalingRotaryEmbedding
 
-    def reset_functions(self):
-        LlamaAttention      .forward = self.original_attention_forward
-        LlamaSdpaAttention  .forward = self.original_sdpa_attention_forward
-        LlamaFlashAttention2.forward = self.original_flash_attention2_forward
-        LlamaDecoderLayer   .forward = self.original_decoder_layer_forward
-        LlamaModel          .forward = self.original_model_forward
-        LlamaForCausalLM    .forward = self.original_for_causal_lm_forward
-        PeftModelForCausalLM.forward = self.original_peft_model_for_causal_lm_forward
-        transformers.models.llama.modeling_llama.LlamaRotaryEmbedding = self.original_LLamaRotaryEmbedding 
-    
+    def reset_functions():
+        LlamaAttention      .forward = original_attention_forward
+        LlamaSdpaAttention  .forward = original_sdpa_attention_forward
+        LlamaFlashAttention2.forward = original_flash_attention2_forward
+        LlamaDecoderLayer   .forward = original_decoder_layer_forward
+        LlamaModel          .forward = original_model_forward
+        LlamaForCausalLM    .forward = original_for_causal_lm_forward
+        PeftModelForCausalLM.forward = original_peft_model_for_causal_lm_forward
+        transformers.models.llama.modeling_llama.LlamaRotaryEmbedding = original_LLamaRotaryEmbedding 
+        #transformers.models.llama.modeling_llama.LlamaLinearScalingRotaryEmbedding = original_LLamaLinearScalingRotaryEmbedding
+
     @staticmethod
     def pre_patch():
         init_name, function = patch_llama_rope_scaling(
