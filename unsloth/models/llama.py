@@ -1592,16 +1592,17 @@ pass
 
 
 class FastLlamaModel:
-    self.original_attention_forward      = LlamaAttention.forward
-    self.original_sdpa_attention_forward = LlamaSdpaAttention.forward
-    self.original_flash_attention2_forward = LlamaFlashAttention2.forward
-    self.original_decoder_layer_forward  = LlamaDecoderLayer.forward
-    self.original_model_forward          = LlamaModel.forward
-    self.original_for_causal_lm_forward  = LlamaForCausalLM.forward
-    self.original_peft_model_for_causal_lm_forward = PeftModelForCausalLM.forward
-    import transformers.models.llama.modeling_llama
-    self.original_LLamaRotaryEmbedding =  transformers.models.llama.modeling_llama.LlamaRotaryEmbedding 
-    def set_functions():
+    def __init__(self):
+        self.original_attention_forward      = LlamaAttention.forward
+        self.original_sdpa_attention_forward = LlamaSdpaAttention.forward
+        self.original_flash_attention2_forward = LlamaFlashAttention2.forward
+        self.original_decoder_layer_forward  = LlamaDecoderLayer.forward
+        self.original_model_forward          = LlamaModel.forward
+        self.original_for_causal_lm_forward  = LlamaForCausalLM.forward
+        self.original_peft_model_for_causal_lm_forward = PeftModelForCausalLM.forward
+        import transformers.models.llama.modeling_llama
+        self.original_LLamaRotaryEmbedding =  transformers.models.llama.modeling_llama.LlamaRotaryEmbedding 
+    def set_functions(self):
         LlamaAttention      .forward = LlamaAttention_fast_forward
         LlamaSdpaAttention  .forward = LlamaAttention_fast_forward
         LlamaFlashAttention2.forward = LlamaAttention_fast_forward
@@ -1611,7 +1612,7 @@ class FastLlamaModel:
         PeftModelForCausalLM.forward = PeftModelForCausalLM_fast_forward
         transformers.models.llama.modeling_llama.LlamaRotaryEmbedding = LlamaRotaryEmbedding
 
-    def reset_functions():
+    def reset_functions(self):
         LlamaAttention      .forward = self.original_attention_forward
         LlamaSdpaAttention  .forward = self.original_sdpa_attention_forward
         LlamaFlashAttention2.forward = self.original_flash_attention2_forward
