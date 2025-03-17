@@ -345,7 +345,36 @@ def patch_mistral_nemo_attention(function):
 pass
 
 
+ Store original Mistral forward methods
+original_mistral_attention_forward = MistralAttention.forward
+original_mistral_sdpa_attention_forward = MistralSdpaAttention.forward
+original_mistral_flash_attention2_forward = MistralFlashAttention2.forward
+original_mistral_decoder_layer_forward = MistralDecoderLayer.forward
+original_mistral_model_forward = MistralModel.forward
+original_mistral_for_causal_lm_forward = MistralForCausalLM.forward
+import transformers.models.mistral.modeling_mistral
+original_MistralRotaryEmbedding = transformers.models.mistral.modeling_mistral.MistralRotaryEmbedding
+
 class FastMistralModel(FastLlamaModel):
+    def set_functions():
+        MistralAttention.forward = MistralAttention_fast_forward
+        MistralSdpaAttention.forward = MistralAttention_fast_forward
+        MistralFlashAttention2.forward = MistralAttention_fast_forward
+        MistralDecoderLayer.forward = LlamaDecoderLayer_fast_forward
+        MistralModel.forward = LlamaModel_fast_forward
+        MistralForCausalLM.forward = MistralForCausalLM_fast_forward
+        PeftModelForCausalLM.forward = PeftModelForCausalLM_fast_forward
+        transformers.models.mistral.modeling_mistral.MistralRotaryEmbedding = LlamaRotaryEmbedding
+    
+    def reset_functions():
+        MistralAttention.forward = original_mistral_attention_forward
+        MistralSdpaAttention.forward = original_mistral_sdpa_attention_forward
+        MistralFlashAttention2.forward = original_mistral_flash_attention2_forward
+        MistralDecoderLayer.forward = original_mistral_decoder_layer_forward
+        MistralModel.forward = original_mistral_model_forward
+        MistralForCausalLM.forward = original_mistral_for_causal_lm_forward
+        PeftModelForCausalLM.forward = original_peft_model_for_causal_lm_forward
+        transformers.models.mistral.modeling_mistral.MistralRotaryEmbedding = original_MistralRotaryEmbedding
 
     @staticmethod
     def pre_patch():
