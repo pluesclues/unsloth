@@ -318,7 +318,7 @@ def PatchRL(FastLanguageModel):
         #breakpoint()
         for i in range(0, queries.shape[0], local_rollout_forward_batch_size):
             padded_query_response = padded_query_responses[i : i + local_rollout_forward_batch_size]
-            breakpoint()
+            #breakpoint()
             output = forward(model, padded_query_response, pad_token_id)
             logits = output.logits[:, context_length - 1 : -1]
             logits /= generation_config.temperature + 1e-7
