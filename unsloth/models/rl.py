@@ -817,6 +817,13 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
 
             selective_log_softmax_code = selective_log_softmax_code,
         )
+        replacement = r"""with torch.no_grad():
+                         with model.disable_adapter(): ref_output = forward(model, query_response, processing_class.pad_token_id)"""        
+        code = """#self.ref_policy = self.ref_policy.to(self.accelerator.device)"""
+        RLTrainer_source = re.sub(r"ref_output = forward\(ref_policy, query_response, processing_class\.pad_token_id\)", replacement, RLTrainer_source)
+        RLTrainer_source = re.sub(r"ref_output = forward\(ref_policy, query_response, processing_class\.pad_token_id\)", replacement, RLTrainer_source)
+        RLTrainer_source = re.sub(r"self\.ref_policy = self\.ref_policy\.to\(self.accelerator\.device\)", code, RLTrainer_source)
+
         #string_conversions = """context_length = queries.shape[1]
         #        queries = [self.processing_class.decode(query) for query in queries]"""
 
