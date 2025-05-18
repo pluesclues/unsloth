@@ -127,9 +127,7 @@ def PatchRL(FastLanguageModel):
     else:
         IS_SAGEMAKER_MP_POST_1_10 = False
     from transformers.trainer_pt_utils import nested_detach
-    
-    #breakpoint()
-    
+    @torch.no_grad()    
     def unsloth_prediction_step(self, model, inputs, prediction_loss_only,ignore_keys,):
         """
         Perform an evaluation step on `model` using `inputs`.
@@ -288,9 +286,6 @@ def PatchRL(FastLanguageModel):
         
         sampling_params.min_tokens = 0 
 
-        eos_token_id = eos_token_id
-        pad_token_id = pad_token_id
-
         # Load the latest weights
         tokenized_query = queries
         queries = [processing_class.decode(query) for query in queries]
@@ -316,10 +311,8 @@ def PatchRL(FastLanguageModel):
         ]
         completion_ids = [ids + [pad_token_id] * (max_tokens - len(ids)) for ids in completion_ids]
 
-        cuda_id = os.environ.get("CUDA_VISIBLE_DEVICES", "0")  
-        device = torch.device(f"cuda:{cuda_id}")
 
-        completion_ids = torch.tensor(completion_ids, device="cuda:0")
+        completion_ids = torch.tensor(completion_ids, device=model.device)
 
         padded_query_responses = torch.cat((tokenized_query, completion_ids), dim=1)
 
@@ -929,8 +922,6 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
     selective_log_softmax_code = inspect.getsource(selective_log_softmax)
 
     if RLTrainer_name == "RLOOTrainer" or RLTrainer_name == "PPOTrainer":
-        #breakpoint()
-        #selective_log_softmax_code = "from trl.trainer.utils import selective_log_softmax"
         if RLTrainer_name == "RLOOTrainer":
             RLTrainer_source = RLTrainer_replacement_rloo.format(
                 RLTrainer_name       = RLTrainer_name,
@@ -976,31 +967,6 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
 
                 selective_log_softmax_code = selective_log_softmax_code,
             )
-            #breakpoint()
-
-        # original_string = """torch_compile_options = {
-        #     "epilogue_fusion"   : True,
-        #     "max_autotune"      : False,
-        #     "shape_padding"     : True,
-        #     "trace.enabled"     : False,
-        #     "triton.cudagraphs" : False,
-        # }
-
-        # @torch.compile(dynamic = True, fullgraph = True, options = torch_compile_options,)
-        # def selective_log_softmax(logits, index):
-        #     logits = logits.to(torch.float32)
-        #     selected_logits = torch.gather(logits, dim = -1, index = index.unsqueeze(-1)).squeeze(-1)
-        #     # loop to reduce peak mem consumption
-        #     # logsumexp_values = torch.stack([torch.logsumexp(lg, dim=-1) for lg in logits])
-        #     logsumexp_values = torch.logsumexp(logits, dim = -1)
-        #     per_token_logps = selected_logits - logsumexp_values  # log_softmax(x_i) = x_i - logsumexp(x)
-        #     return per_token_logps
-        # """
-
-        # new_string = "from trl.trainer.utils import selective_log_softmax"
-
-        # RLTrainer_source = RLTrainer_source.replace(original_string, new_string)
-
 
         string_conversions = """context_length = queries.shape[1]
                queries = [self.processing_class.decode(query) for query in queries]"""
@@ -1027,16 +993,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
                     \t\tprocessing_class.eos_token_id,
                     \t\tprocessing_class,
                     \t\tgeneration_config"""
-            # Use regex to replace the query with queries
-            # Use regex to replace the query with queries
-            # Corrected version
-            # Define the old and new strings
-            # old_string = 'query = batch["input_ids"]'
-            # new_string = 'queries = batch["input_ids"]'
 
-            # # Perform the replacement
-            # RLTrainer_source = RLTrainer_source.replace(old_string, new_string)
-            # Use regex to replace the function arguments
             RLTrainer_source = re.sub(
                 r"query_responses, logitss = batch_generation\((.*?)\)",  # Match function call
                 rf"query_responses, logitss = batch_generation({new_arguments})",  # Replace with new arguments
@@ -1076,9 +1033,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
                 output = self.critic_backbone(**kwargs)
                 logits = self.value_model.score(output.hidden_states[-1])
                 FastLanguageModel.set_functions()
-                #breakpoint()
                 
-                #policy_logits = forward(self.policy, kwargs["input_ids"], 128004)
                 policy_logits = self.policy(**kwargs)
                 
                 return policy_logits, logits
@@ -1088,25 +1043,13 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
             RLTrainer_source = re.sub(old_policy_value_wrapper, new_policy_value_wrapper, RLTrainer_source)
 
 
-            #breakpoint()
         # replacement = r"""with torch.no_grad():
         #                 with model.disable_adapter(): ref_output = forward(model, query_response, processing_class.pad_token_id)"""        
         # code = """#self.ref_policy = self.ref_policy.to(self.accelerator.device)"""
         # RLTrainer_source = re.sub(r"ref_output = forward\(ref_policy, query_response, processing_class\.pad_token_id\)", replacement, RLTrainer_source)
         # #RLTrainer_source = re.sub(r"ref_output = forward\(ref_policy, query_response, processing_class\.pad_token_id\)", replacement, RLTrainer_source)
         # RLTrainer_source = re.sub(r"self\.ref_policy = self\.ref_policy\.to\(self.accelerator\.device\)", code, RLTrainer_source)
-
-        peft_replace = """unwrapped_model,"""
-
-        # old_logits_calc = """logits = logitss[i : i + args.local_rollout_forward_batch_size]"""
-        # new_logits_calc = """# logits = logitss[i : i + args.local_rollout_forward_batch_size]
-        # output = forward(model, padded_query_response, pad_token_id) 
-        # logits = output.logits[:, context_length - 1 : -1] 
-        # logits /= generation_config.temperature + 1e-7
-        # """
-        # RLTrainer_source = RLTrainer_source.replace(old_logits_calc, new_logits_calc)
-
-        #RLTrainer_source = RLTrainer_source.replace("context_length = queries.shape[1]", string_conversions)
+    
     else:
         RLTrainer_source = RLTrainer_replacement.format(
             RLTrainer_name       = RLTrainer_name,
