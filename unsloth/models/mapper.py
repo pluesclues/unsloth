@@ -728,16 +728,6 @@ __INT_TO_FLOAT_MAPPER = \
         "mistralai/Mistral-Small-3.1-24B-Base-2503",
         "unsloth/Mistral-Small-3.1-24B-Base-2503-bnb-4bit",
     ),
-    "unsloth/orpheus-3b-0.1-pretrained-unsloth-bnb-4bit" : (
-        "unsloth/orpheus-3b-0.1-pretrained",
-        "canopylabs/orpheus-3b-0.1-pretrained",
-        "unsloth/orpheus-3b-0.1-pretrained-bnb-4bit",
-    ),
-    "unsloth/orpheus-3b-0.1-ft-unsloth-bnb-4bit" : (
-        "unsloth/orpheus-3b-0.1-ft",
-        "canopylabs/orpheus-3b-0.1-ft",
-        "unsloth/orpheus-3b-0.1-ft-bnb-4bit",
-    ),
     "unsloth/Qwen3-0.6B-unsloth-bnb-4bit" : (
         "unsloth/Qwen3-0.6B",
         "Qwen/Qwen3-0.6B",
@@ -816,6 +806,63 @@ __INT_TO_FLOAT_MAPPER = \
         "unsloth/phi-4-mini-reasoning",
         "microsoft/Phi-4-mini-reasoning",
         "unsloth/phi-4-mini-reasoning-bnb-4bit",
+    ),
+    "unsloth/orpheus-3b-0.1-pretrained-unsloth-bnb-4bit" : (
+        "unsloth/orpheus-3b-0.1-pretrained",
+        "canopylabs/orpheus-3b-0.1-pretrained",
+        "unsloth/orpheus-3b-0.1-pretrained-bnb-4bit",
+    ),
+    "unsloth/orpheus-3b-0.1-ft-unsloth-bnb-4bit" : (
+        "unsloth/orpheus-3b-0.1-ft",
+        "canopylabs/orpheus-3b-0.1-ft",
+        "unsloth/orpheus-3b-0.1-ft-bnb-4bit",
+    ),
+    "unsloth/csm-1b" : (
+        "unsloth/csm-1b",
+        "sesame/csm-1b",
+    ),
+    "unsloth/whisper-large-v3" : (
+        "unsloth/whisper-large-v3",
+        "openai/whisper-large-v3",
+    ),
+    "unsloth/whisper-large-v3-turbo" : (
+        "unsloth/whisper-large-v3-turbo",
+        "openai/whisper-large-v3-turbo",
+    ),
+    "unsloth/whisper-small" : (
+        "unsloth/whisper-small",
+        "openai/whisper-small",
+    ),
+    "unsloth/CrisperWhisper" : (
+        "unsloth/CrisperWhisper",
+        "nyrahealth/CrisperWhisper",
+    ),
+    "unsloth/Llasa-1B" : (
+        "unsloth/Llasa-1B",
+        "HKUSTAudio/Llasa-1B",
+    ),
+    "unsloth/Spark-TTS-0.5B" : (
+        "unsloth/Spark-TTS-0.5B",
+        "SparkAudio/Spark-TTS-0.5B",
+    ),
+    "unsloth/Llama-OuteTTS-1.0-1B" : (
+        "unsloth/Llama-OuteTTS-1.0-1B",
+        "OuteAI/Llama-OuteTTS-1.0-1B",
+    ),
+    "unsloth/medgemma-4b-it-unsloth-bnb-4bit" : (
+        "unsloth/medgemma-4b-it",
+        "google/medgemma-4b-it",
+        "unsloth/medgemma-4b-it-bnb-4bit",
+    ),
+    "unsloth/medgemma-27b-text-it-unsloth-bnb-4bit" : (
+        "unsloth/medgemma-27b-text-it",
+        "google/medgemma-27b-text-it",
+        "unsloth/medgemma-27b-text-it-bnb-4bit",
+    ),
+    "unsloth/Devstral-Small-2505-unsloth-bnb-4bit" : (
+        "unsloth/Devstral-Small-2505",
+        "mistralai/Devstral-Small-2505",
+        "unsloth/Devstral-Small-2505-bnb-4bit",
     ),
 }
 
