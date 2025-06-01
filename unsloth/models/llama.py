@@ -1950,6 +1950,11 @@ class FastLlamaModel:
             "is_torch_tpu_available()",
             "False",
         )
+        # This has to do with the transformers update, its a monkey patch.
+        inner_training_loop = inner_training_loop.replace(
+            ", learning_rate=learning_rate", 
+            ""
+        )
         exec(inner_training_loop, globals())
         Trainer._inner_training_loop = _fast_inner_training_loop
 
