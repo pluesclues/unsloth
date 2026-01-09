@@ -139,7 +139,7 @@ from .import_fixes import (
 fix_xformers_performance_issue()
 fix_vllm_aimv2_issue()
 fix_vllm_guided_decoding_params()
-#fix_vllm_pdl_blackwell()
+fix_vllm_pdl_blackwell()
 ignore_logger_messages()
 patch_ipykernel_hf_xet()
 patch_trackio()
